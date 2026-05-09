@@ -1,4 +1,4 @@
-package com.mintcoin;
+package com.tuituicoin;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;

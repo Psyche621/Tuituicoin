@@ -1,4 +1,4 @@
-package com.mintcoin;
+package com.tuituicoin;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -10,7 +10,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.util.ArrayList;
 
-import com.mintcoin.util.Hash;
+import com.tuituicoin.util.Hash;
 
 public class Chain {
     private static Chain instance = new Chain();

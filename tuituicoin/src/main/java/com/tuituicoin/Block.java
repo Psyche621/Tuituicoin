@@ -1,11 +1,11 @@
-package com.mintcoin;
+package com.tuituicoin;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 
-import com.mintcoin.util.Hash;
+import com.tuituicoin.util.Hash;
 
 public class Block {
     private String hash;

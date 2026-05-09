@@ -1,4 +1,4 @@
-package com.mintcoin;
+package com.tuituicoin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

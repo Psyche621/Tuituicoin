@@ -1,4 +1,4 @@
-package com.mintcoin.util;
+package com.tuituicoin.util;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
