@@ -1,5 +1,6 @@
 package com.mintcoin;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -27,12 +28,12 @@ public class Chain {
         return chain.get(chain.size() - 1);
     }
 
-    public void addBlock(Transaction transaction, PublicKey senderPublicKey, byte[] signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public void addBlock(Transaction transaction, PublicKey senderPublicKey, byte[] signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, UnsupportedEncodingException {
         Signature verifier = Signature.getInstance("SHA256withRSA");
         verifier.initVerify(senderPublicKey);
         verifier.update(signature);
         if (verifier.verify(signature)) { 
-            Block block = new Block(getLastBlock().hash(), transaction, signature);
+            Block block = new Block(getLastBlock().getHash(), transaction, signature);
             chain.add(block);
         }
     }

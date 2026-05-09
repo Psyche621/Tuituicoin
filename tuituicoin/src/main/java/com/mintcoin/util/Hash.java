@@ -1,12 +1,14 @@
 package com.mintcoin.util;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Hash {
-    public static String hash(String algorithm) throws NoSuchAlgorithmException {
+    public static String hash(String input, String algorithm) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest digest = MessageDigest.getInstance(algorithm);
-        byte[] hash = digest.digest();
+
+        byte[] hash = digest.digest(input.getBytes("UTF-8"));
 
         StringBuilder hexString = new StringBuilder();
         for (byte b : hash) {
