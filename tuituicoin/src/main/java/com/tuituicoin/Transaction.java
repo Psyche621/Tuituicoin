@@ -1,13 +1,18 @@
 package com.tuituicoin;
 
+import java.security.PublicKey;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuituicoin.util.Hash;
 
 public class Transaction {
+    private String transactionId;
     private long amount;
-    private String payer;
-    private String payee;
+    private PublicKey payer;
+    private PublicKey payee;
 
-    public Transaction(long amount, String payer, String payee) {
+    public Transaction(long amount, PublicKey payer, PublicKey payee) {
+        transactionId = Hash.hash(serialize(), "SHA-256");
         this.amount = amount;
         this.payer = payer;
         this.payee = payee;
@@ -17,32 +22,20 @@ public class Transaction {
         return amount;
     }
 
-    public void setAmount(long amount) {
-        this.amount = amount;
-    }
-
-    public String getPayer() {
+    public PublicKey getPayer() {
         return payer;
     }
 
-    public void setPayer(String payer) {
-        this.payer = payer;
-    }
-
-    public String getPayee() {
+    public PublicKey getPayee() {
         return payee;
     }
 
-    public void setPayee(String payee) {
-        this.payee = payee;
-    }
-
-    public String toString() {
+    public String serialize() {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(this);
         } catch(Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 }

@@ -1,30 +1,29 @@
 package com.tuituicoin;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.tuituicoin.util.Hash;
 
 public class Block {
     private String hash;
     private String prevHash;
-    private Transaction transaction;
+    private List<Transaction> transactions = new ArrayList<>();
     private Instant timestamp = Instant.now();
     private byte[] signature = null;
+    private long nonce = 0;
 
-    private long nonce = Math.round(Math.random() * 999999999);
-
-    public Block(String prevHash, Transaction transaction, byte[] signature) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public Block(String prevHash, Transaction transaction, byte[] signature) {
         this.prevHash = prevHash;
-        this.transaction = transaction;
+        transactions.add(transaction);
         this.hash = calculateHash();
         setSignature(signature);
     }
 
-    public String calculateHash() throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        String input = prevHash + timestamp.toString() + transaction.toString();
+    public String calculateHash() {
+        String input = prevHash + timestamp.toString() + transactions.toString() + nonce;
         return hash(input); 
     }
 
@@ -34,7 +33,7 @@ public class Block {
         }
     }
 
-    public static String hash(String input) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static String hash(String input) {
         return Hash.hash(input, "SHA256");
     }
 
@@ -46,7 +45,15 @@ public class Block {
         return prevHash;
     }
 
-    public Transaction getTransaction() {
-        return transaction;
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void mine(int difficulty) throws NoSuchAlgorithmException {
+        String target = new String(new char[difficulty]).replace('\0', '0');
+        while (!hash.substring(0, difficulty).equals(target)) {
+            nonce++;
+            hash = calculateHash();
+        }
     }
 }
