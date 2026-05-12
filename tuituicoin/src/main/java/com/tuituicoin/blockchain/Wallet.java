@@ -5,11 +5,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Signature;
-import java.util.Base64;
 
 public class Wallet {
-    private final String publicKeyString;
     private final PublicKey publicKey;
     private final PrivateKey privateKey;
 
@@ -18,7 +15,6 @@ public class Wallet {
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-        publicKeyString = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded()); 
         publicKey = keyPair.getPublic();
         privateKey = keyPair.getPrivate();
     }

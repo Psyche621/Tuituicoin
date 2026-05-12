@@ -6,16 +6,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseManager {
-    private static final String url = "jdbc:sqlite:blockchain.db";
-
     public DatabaseManager() {}
 
-    public static Connection connect() throws SQLException {
-        return DriverManager.getConnection(url);
+    private static String getUrl() {
+        return System.getProperty("tuituicoin.db.url", "jdbc:sqlite:blockchain.db");
     }
 
-    private static void initialize() throws SQLException {
-        try (Connection conn = DriverManager.getConnection(url)) {
+    public static Connection connect() throws SQLException {
+        initialize();
+        return DriverManager.getConnection(getUrl());
+    }
+
+    public static void initialize() throws SQLException {
+        try (Connection conn = DriverManager.getConnection(getUrl())) {
             Statement stmt = conn.createStatement();
             
             stmt.execute("""
@@ -30,7 +33,7 @@ public class DatabaseManager {
 
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS transactions (
-                    transaction_id TEXT PRIMARY KEY
+                    transaction_id TEXT PRIMARY KEY,
                     block_hash TEXT,
                     sender TEXT,
                     recipient TEXT,

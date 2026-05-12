@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import com.tuituicoin.blockchain.Transaction;
@@ -31,10 +32,12 @@ public class SQLiteTransactionRepository implements TransactionRepository {
 
             stmt.setString(1, transaction.getTransactionId());
             stmt.setString(2, transaction.getBlockHash());
-            stmt.setString(3, transaction.getSender().toString());
-            stmt.setString(4, transaction.getRecipient().toString());
+            stmt.setString(3, Base64.getEncoder().encodeToString(transaction.getSender().getEncoded()));
+            stmt.setString(4, Base64.getEncoder().encodeToString(transaction.getRecipient().getEncoded()));
             stmt.setLong(5, transaction.getAmount());
-            stmt.setString(6, blockHash);
+            stmt.setBytes(6, transaction.getSignature());
+
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

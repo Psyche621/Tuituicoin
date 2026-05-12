@@ -38,7 +38,7 @@ public class Block {
     /* Creates a hash based on the variables in the object. */
     public String calculateHash() {
         String input = prevHash + timestamp.toString() + transactions.toString() + nonce;
-        return Hash.hash(input, "SHA256"); 
+        return Hash.hash(input, "SHA-256"); 
     }
 
     public int getHeight() {

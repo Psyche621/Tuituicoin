@@ -1,8 +1,10 @@
 package com.tuituicoin.blockchain;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.List;
 
+import com.tuituicoin.repository.DatabaseManager;
 import com.tuituicoin.repository.SQLiteBlockRepository;
 
 public class Chain {
@@ -10,22 +12,23 @@ public class Chain {
     private Wallet genesisWallet;
     private SQLiteBlockRepository blockRepository;
 
-    public Chain() throws NoSuchAlgorithmException {
+    private Chain() throws NoSuchAlgorithmException {
         genesisWallet = new Wallet();
-        instance = getInstance();
-        // Transaction genesistTransaction = new Transaction(100, null, )
-        // chain.add(new Block("0", new Transaction(100, "Mike", "Bob"), null));
+        blockRepository = new SQLiteBlockRepository();
+        try {
+            DatabaseManager.initialize();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
     }
 
     public static synchronized Chain getInstance() {
-        try {
-            if (instance == null) {
+        if (instance == null) {
+            try {
                 instance = new Chain();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("Unable to initialize chain", e);
             }
-            
-            return instance;
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("No such algorithm in creating chain instance");
         }
 
         return instance;
@@ -41,7 +44,14 @@ public class Chain {
         }
 
         Block lastBlock = getLastBlock();
-        Block block = new Block(lastBlock.getHeight() + 1, lastBlock.getHash(), transaction);
+        Block block;
+
+        if (lastBlock == null) {
+            block = new Block(0, "0", transaction);
+        } else {
+            block = new Block(lastBlock.getHeight() + 1, lastBlock.getHash(), transaction);
+        }
+
         block.mine(4);
 
         blockRepository.save(block);
@@ -50,7 +60,7 @@ public class Chain {
     public boolean isValid() {
         List<Block> chain = blockRepository.findAll();
 
-        if (chain.isEmpty()) {
+        if (chain == null || chain.isEmpty()) {
             return true;
         }
 
@@ -70,7 +80,7 @@ public class Chain {
                 continue;
             }
 
-            Block previous = chain.get(i - 1);           
+            Block previous = chain.get(i - 1);
 
             // Verify linkage
             if (!current.getPrevHash().equals(previous.getHash())) {

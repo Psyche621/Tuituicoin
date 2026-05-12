@@ -37,6 +37,10 @@ public class SQLiteBlockRepository implements BlockRepository {
             stmt.setInt(5, block.getNonce());
 
             stmt.executeUpdate();
+
+            for (Transaction transaction : block.getTransactions()) {
+                transactionRepository.save(transaction, block.getHash());
+            }
         } catch (SQLException e) {
             System.err.println("Saving block failed");
             e.printStackTrace();
