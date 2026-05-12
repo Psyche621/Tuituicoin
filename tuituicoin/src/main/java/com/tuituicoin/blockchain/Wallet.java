@@ -1,4 +1,4 @@
-package com.tuituicoin;
+package com.tuituicoin.blockchain;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -23,16 +23,13 @@ public class Wallet {
         privateKey = keyPair.getPrivate();
     }
 
-    public void sendMoney(long amount, PublicKey payeePublicKey) throws Exception {
-        Transaction transaction = new Transaction(amount, this.publicKey, payeePublicKey);
+    public void sendMoney(long amount, Block block, PublicKey payeePublicKey) throws Exception {
+        /* Transaction transaction = new Transaction(amount, block.getHash(), this.publicKey, payeePublicKey);
         byte[] signature = sign(transaction.serialize(), this.privateKey);
-        Chain.getInstance().addBlock(transaction, this.publicKey, signature);
-    }
+        Chain.getInstance().addBlock(transaction, this.publicKey, transaction); */
 
-    private static byte[] sign(String input, PrivateKey privateKey) throws Exception {
-        Signature sign = Signature.getInstance("SHA256withRSA");
-        sign.initSign(privateKey);
-        sign.update(input.getBytes());
-        return sign.sign();
+        Transaction transaction = new Transaction(amount, block.getHash(), this.publicKey, payeePublicKey);
+        transaction.sign(this.privateKey);
+        Chain.getInstance().addBlock(transaction);
     }
 }

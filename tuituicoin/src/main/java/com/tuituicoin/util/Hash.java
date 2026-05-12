@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Hash {
+    /* Helper function for hashes  */
     public static String hash(String input, String algorithm) {
         try {
             MessageDigest digest = MessageDigest.getInstance(algorithm);

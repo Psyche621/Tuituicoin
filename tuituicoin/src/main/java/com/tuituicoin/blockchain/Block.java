@@ -1,4 +1,4 @@
-package com.tuituicoin;
+package com.tuituicoin.blockchain;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -9,32 +9,40 @@ import com.tuituicoin.util.Hash;
 
 public class Block {
     private String hash;
+    private int height;
     private String prevHash;
     private List<Transaction> transactions = new ArrayList<>();
     private Instant timestamp = Instant.now();
-    private byte[] signature = null;
-    private long nonce = 0;
+    private int nonce = 0;
 
-    public Block(String prevHash, Transaction transaction, byte[] signature) {
+    /* Constructor for loaded blocks. 
+     * Used for reconstructing a block found in an SQL query */
+    public Block(String hash, int height, String prevHash, List<Transaction> transactions, Instant timestamp, int nonce) {
+        this.hash = hash;
+        this.height = height;
+        this.prevHash = prevHash;
+        this.transactions = transactions;
+        this.timestamp = timestamp;
+        this.nonce = nonce;
+    }
+
+    /* Constructor how creating a new block.
+     * Attaches the previous hash and associated transaction */
+    public Block(int height, String prevHash, Transaction transaction) {
+        this.height = height;
         this.prevHash = prevHash;
         transactions.add(transaction);
         this.hash = calculateHash();
-        setSignature(signature);
     }
 
+    /* Creates a hash based on the variables in the object. */
     public String calculateHash() {
         String input = prevHash + timestamp.toString() + transactions.toString() + nonce;
-        return hash(input); 
+        return Hash.hash(input, "SHA256"); 
     }
 
-    private void setSignature(byte[] signature) {
-        if (this.signature == null) {
-            this.signature = signature;
-        }
-    }
-
-    public static String hash(String input) {
-        return Hash.hash(input, "SHA256");
+    public int getHeight() {
+        return height;
     }
 
     public String getHash() {
@@ -47,6 +55,14 @@ public class Block {
 
     public List<Transaction> getTransactions() {
         return transactions;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    public int getNonce() {
+        return nonce;
     }
 
     public void mine(int difficulty) throws NoSuchAlgorithmException {
