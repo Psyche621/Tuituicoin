@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+
 public class Wallet {
     private final PublicKey publicKey;
     private final PrivateKey privateKey;
@@ -20,12 +22,13 @@ public class Wallet {
     }
 
     public void sendMoney(long amount, Block block, PublicKey payeePublicKey) throws Exception {
-        /* Transaction transaction = new Transaction(amount, block.getHash(), this.publicKey, payeePublicKey);
-        byte[] signature = sign(transaction.serialize(), this.privateKey);
-        Chain.getInstance().addBlock(transaction, this.publicKey, transaction); */
-
         Transaction transaction = new Transaction(amount, block.getHash(), this.publicKey, payeePublicKey);
         transaction.sign(this.privateKey);
         Chain.getInstance().addBlock(transaction);
+    }
+
+    public JSONPObject toJSON() {
+        // TODO: implement for saving wallet to file
+        return null;
     }
 }
