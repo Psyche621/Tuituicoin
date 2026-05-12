@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.tuituicoin.blockchain.ChainTest
--------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.62 s - in com.tuituicoin.blockchain.ChainTest
