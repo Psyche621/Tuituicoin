@@ -1,7 +1,7 @@
 package com.tuituicoin.cli.chain;
 
 import com.tuituicoin.blockchain.Block;
-import com.tuituicoin.blockchain.Chain;
+import com.tuituicoin.repository.SQLiteBlockRepository;
 
 import picocli.CommandLine.Command;
 
@@ -10,10 +10,5 @@ import picocli.CommandLine.Command;
 public class ChainLatestCommand implements Runnable {
     @Override
     public void run() {
-        try {
-            //Block latest = blockRepository.findLatest()
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

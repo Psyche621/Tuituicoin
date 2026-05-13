@@ -22,6 +22,6 @@ import picocli.CommandLine.Command;
 public class NodeCommand implements Runnable {
     @Override
     public void run() {
-        System.out.println("Blockchain node created!");
+        System.out.println("Node commands");
     }
 }

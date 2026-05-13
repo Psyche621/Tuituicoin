@@ -1,5 +1,15 @@
 package com.tuituicoin.cli.transaction;
 
-public class TransactionCommand {
+import picocli.CommandLine.Command;
 
+@Command(
+    name = "tx",
+    subcommands = {}
+)
+
+public class TransactionCommand implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("Transaction commands");
+    }
 }
