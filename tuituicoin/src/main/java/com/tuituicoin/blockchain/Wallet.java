@@ -34,6 +34,10 @@ public class Wallet {
         Chain.getInstance().addBlock(transaction);
     }
 
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
     public JSONPObject toJSON() {
         // TODO: implement for saving wallet to file
         return null;

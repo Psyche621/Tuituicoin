@@ -67,13 +67,19 @@ public class Transaction {
         return signature;
     }
 
-    public void sign(PrivateKey privateKey) throws Exception {
-        Signature sign = Signature.getInstance("SHA256withRSA");
-        sign.initSign(privateKey);
-        sign.update(getSigningData().getBytes(StandardCharsets.UTF_8));
-        this.signature = sign.sign();
+    public void sign(PrivateKey privateKey) {
+        try {
+            LOGGER.info("Signing transaction with ID: " + transactionId);
+            Signature sign = Signature.getInstance("SHA256withRSA");
+            sign.initSign(privateKey);
+            sign.update(getSigningData().getBytes(StandardCharsets.UTF_8));
+            this.signature = sign.sign();
 
-        LOGGER.info("Transaction " + transactionId + " signed successfully.");
+            LOGGER.info("Transaction " + transactionId + " signed successfully.");
+        } catch (Exception e) {
+            LOGGER.severe("Failed to sign transaction: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public boolean verify() throws Exception {
@@ -97,6 +103,8 @@ public class Transaction {
     }
 
     public String serialize() {
+        LOGGER.info("Serializing transaction with ID: " + transactionId);
+
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(this);

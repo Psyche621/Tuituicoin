@@ -1,6 +1,6 @@
 [
   {
-    "name" : "com.tuituicoin.cli.chain.ChainLatestCommand",
+    "name" : "com.tuituicoin.cli.node.NodeInitialize",
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,
     "allDeclaredMethods" : true,
