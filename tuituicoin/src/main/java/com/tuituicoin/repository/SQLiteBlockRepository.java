@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.tuituicoin.blockchain.Block;
 import com.tuituicoin.blockchain.Transaction;
@@ -14,8 +15,12 @@ import com.tuituicoin.blockchain.Transaction;
 public class SQLiteBlockRepository implements BlockRepository {
     private SQLiteTransactionRepository transactionRepository = new SQLiteTransactionRepository();
 
+    private static final Logger LOGGER = Logger.getLogger(SQLiteBlockRepository.class.getName());
+
     @Override
     public void save(Block block) {
+        LOGGER.info("Saving block with hash: " + block.getHash());
+
         String sql = """
             INSERT INTO blocks (
                 hash,
@@ -41,14 +46,17 @@ public class SQLiteBlockRepository implements BlockRepository {
             for (Transaction transaction : block.getTransactions()) {
                 transactionRepository.save(transaction, block.getHash());
             }
+
+            LOGGER.info("Block saved successfully.");
         } catch (SQLException e) {
-            System.err.println("Saving block failed");
+            LOGGER.severe("Failed to save block: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     @Override
     public Block findByHash(String hash) {
+        LOGGER.info("Finding block by hash: " + hash);
         String sql = """
             SELECT * FROM blocks WHERE hash = ?
         """;
@@ -73,7 +81,7 @@ public class SQLiteBlockRepository implements BlockRepository {
                 return new Block(blockHash, height, prevHash, transactions, timestamp, nonce);
             }
         } catch (SQLException e) {
-            System.err.println("Database query failed");
+            LOGGER.severe("Failed to find block by hash: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -83,6 +91,7 @@ public class SQLiteBlockRepository implements BlockRepository {
      * assigning height */
     @Override
     public Block findLatest() {
+        LOGGER.info("Finding latest block in the database.");
         String sql = """
             SELECT * FROM blocks ORDER BY height DESC LIMIT 1 
         """;
@@ -106,7 +115,7 @@ public class SQLiteBlockRepository implements BlockRepository {
                 return new Block(blockHash, height, prevHash, transactions, timestamp, nonce);
             }
         } catch (SQLException e) {
-            System.err.println("Database query failed");
+            LOGGER.severe("Failed to find block by hash: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -114,6 +123,7 @@ public class SQLiteBlockRepository implements BlockRepository {
 
     @Override
     public List<Block> findAll() {
+        LOGGER.info("Finding all blocks in the database.");
         String sql = """
             SELECT * FROM blocks
         """;
@@ -139,7 +149,7 @@ public class SQLiteBlockRepository implements BlockRepository {
                 return blockList;
             }
         } catch (SQLException e) {
-            System.err.println("Database query failed");
+            LOGGER.severe("Failed to find all blocks: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

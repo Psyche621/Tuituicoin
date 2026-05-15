@@ -8,13 +8,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.tuituicoin.blockchain.Transaction;
 import com.tuituicoin.util.PublicKeyStringDecoder;
 
 public class SQLiteTransactionRepository implements TransactionRepository {
+    private static final Logger LOGGER = Logger.getLogger(SQLiteTransactionRepository.class.getName());
+
     @Override
     public void save(Transaction transaction, String blockHash) {
+        LOGGER.info("Saving transaction with ID: " + transaction.getTransactionId() + " to block hash: " + blockHash);
+
         String sql = """
             INSERT INTO transactions (
                 transaction_id,
@@ -38,13 +43,17 @@ public class SQLiteTransactionRepository implements TransactionRepository {
             stmt.setBytes(6, transaction.getSignature());
 
             stmt.executeUpdate();
+            LOGGER.info("Transaction saved successfully.");
         } catch (SQLException e) {
+            LOGGER.severe("Failed to save transaction: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     @Override
     public List<Transaction> findById(String id) {
+        LOGGER.info("Finding transaction by ID: " + id);
+
         String sql = """
             SELECT * FROM transactions WHERE transaction_id = ?
         """;
@@ -72,9 +81,11 @@ public class SQLiteTransactionRepository implements TransactionRepository {
                     transactions.add(new Transaction(transactionId, blockHash, amount, sender, recipient, signature));
                 }
 
+                LOGGER.info("Transaction(s) found successfully.");
                 return transactions;
             }
         } catch (SQLException e) {
+            LOGGER.severe("Failed to find transaction by ID: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -83,6 +94,8 @@ public class SQLiteTransactionRepository implements TransactionRepository {
     /* Select a transaction by the associated block */
     @Override
     public List<Transaction> findByBlockHash(String hash) {
+        LOGGER.info("Finding transactions by block hash: " + hash);
+
         String sql = """
             SELECT * FROM transactions WHERE block_hash = ?
         """;
@@ -110,9 +123,11 @@ public class SQLiteTransactionRepository implements TransactionRepository {
                     transactions.add(new Transaction(transactionId, blockHash, amount, sender, recipient, signature));
                 }
 
+                LOGGER.info("Transactions for block hash: " + hash + " found successfully.");
                 return transactions;
             }
         } catch (SQLException e) {
+            LOGGER.severe("Failed to find transactions by block hash: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -120,6 +135,8 @@ public class SQLiteTransactionRepository implements TransactionRepository {
 
     @Override 
     public List<Transaction> findAll() throws SQLException {
+        LOGGER.info("Finding all transactions in the database.");
+
         String sql = """
             SELECT * FROM transactions 
         """;
@@ -145,8 +162,13 @@ public class SQLiteTransactionRepository implements TransactionRepository {
                     transactions.add(new Transaction(transactionId, blockHash, amount, sender, recipient, signature));
                 }
 
+                LOGGER.info("All transactions found successfully.");
                 return transactions;
             }
+        } catch (SQLException e) {
+            LOGGER.severe("Failed to find all transactions: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-    }
+    } 
 }

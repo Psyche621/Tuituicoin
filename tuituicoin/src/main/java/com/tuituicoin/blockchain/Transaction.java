@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuituicoin.util.Hash;
@@ -16,6 +17,7 @@ public class Transaction {
     private PublicKey recipient;
     private byte[] signature = null;
 
+    private static final Logger LOGGER = Logger.getLogger(Transaction.class.getName());
 
     /* Constructor for new transaction objects */
     public Transaction(long amount, String blockHash, PublicKey sender, PublicKey recipient) {
@@ -24,6 +26,8 @@ public class Transaction {
         this.amount = amount;
         this.sender = sender;
         this.recipient = recipient;
+
+        LOGGER.info("Created new transaction with ID: " + transactionId);
     }
 
     /* Constructor for reconstructing transaction objects */
@@ -35,6 +39,8 @@ public class Transaction {
         this.sender = sender;
         this.recipient = recipient;
         this.signature = signature;
+
+        LOGGER.info("Loaded transaction with ID: " + transactionId);
     }
 
     public String getTransactionId() {
@@ -66,13 +72,17 @@ public class Transaction {
         sign.initSign(privateKey);
         sign.update(getSigningData().getBytes(StandardCharsets.UTF_8));
         this.signature = sign.sign();
+
+        LOGGER.info("Transaction " + transactionId + " signed successfully.");
     }
 
     public boolean verify() throws Exception {
         if (signature == null) {
+            LOGGER.warning("Transaction " + transactionId + " has no signature.");
             return false;
         }
 
+        LOGGER.info("Verifying transaction with ID: " + transactionId);
         Signature verifier = Signature.getInstance("SHA256withRSA");
 
         verifier.initVerify(sender);
@@ -82,6 +92,7 @@ public class Transaction {
     }
 
     private String getSigningData() {
+        LOGGER.info("Generating signing data for transaction: " + transactionId);
         return amount + sender.toString() + recipient.toString();
     }
 
