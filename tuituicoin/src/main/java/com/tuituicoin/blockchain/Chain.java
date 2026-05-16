@@ -10,13 +10,11 @@ import com.tuituicoin.repository.SQLiteBlockRepository;
 
 public class Chain {
     private static Chain instance;
-    private Wallet genesisWallet;
     private SQLiteBlockRepository blockRepository;
 
     private static final Logger LOGGER = Logger.getLogger(Chain.class.getName());
 
     private Chain() throws NoSuchAlgorithmException {
-        genesisWallet = new Wallet();
         blockRepository = new SQLiteBlockRepository();
         try {
             DatabaseManager.initialize();
