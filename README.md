@@ -41,3 +41,9 @@ source ~/.zshrc
 ```
 
 ### Windows
+
+Coming soon
+
+# Feedback
+
+If you find any bugs, performance ineffiencies or any other improvements I can make, please let me know! I won't be accepting merge requests as this is a learning project. Thank you!
