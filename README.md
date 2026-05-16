@@ -42,7 +42,29 @@ source ~/.zshrc
 
 ### Windows
 
-Coming soon
+GUI Method:
+1. Search for "Edit the system environmental variables" in the Start menu and open it.
+2. Click **Environmental Variables**
+3. Under "User variables", click **New**
+    - **Variable name:** `PATH`
+    - **Variable value:** Paste the program path 
+4. Click **OK** three times
+5. **Close and reopen your terminal**
+
+PowerShell Method:
+
+1. Open PowerShell as Administrator and run:
+
+```powershell
+$projectPath = "C:\path\to\program"
+[Environment]::SetEnvironmentVariable("PATH", "$env:PATH;$projectPath", "User")
+```
+
+2. Restart PowerShell and test:
+
+```powershell
+tuiranode.bat --help
+```
 
 # Feedback
 
