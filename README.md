@@ -1,3 +1,27 @@
+# Setup
+
+## Clone repository
+
+Clone repository to a folder of your choosing
+
+```bash
+git clone https://github.com/Psyche621/Tuituicoin.git
+```
+
+## Run the setup script
+
+Make sure you have Python 3.7 or higher installed, then run the setup script from the root folder of the project. This will compile the project into a shaded JAR file.
+
+Linux/MacOS:
+```bash
+python3 setup.py
+```
+
+Windows:
+```powershell
+python setup.py
+```
+
 ## Adding to PATH
 
 After running `python3 setup.py`, add the project directory to your system PATH to use `tuiranode` from anywhere.
@@ -14,3 +38,6 @@ source ~/.bashrc
 # For zsh (newer macOS default):
 echo 'export PATH="'$(pwd)':$PATH"' >> ~/.zshrc
 source ~/.zshrc
+```
+
+### Windows
