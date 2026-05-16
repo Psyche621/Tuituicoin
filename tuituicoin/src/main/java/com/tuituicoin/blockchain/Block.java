@@ -75,7 +75,7 @@ public class Block {
         String target = new String(new char[difficulty]).replace('\0', '0');
         while (!hash.substring(0, difficulty).equals(target)) {
             nonce++;
-            hash = calculateHash();
+            this.hash = calculateHash();
         }
 
         LOGGER.info("Block mined with hash: " + hash);

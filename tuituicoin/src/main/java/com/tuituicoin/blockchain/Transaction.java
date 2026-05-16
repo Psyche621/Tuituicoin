@@ -21,7 +21,7 @@ public class Transaction {
 
     /* Constructor for new transaction objects */
     public Transaction(long amount, String blockHash, PublicKey sender, PublicKey recipient) {
-        transactionId = Hash.hash(serialize(), "SHA-256");
+        this.transactionId = Hash.hash(serialize(), "SHA-256");
         this.blockHash = blockHash;
         this.amount = amount;
         this.sender = sender;
@@ -67,6 +67,7 @@ public class Transaction {
         return signature;
     }
 
+    /* Signs the transaction with the provided private key */
     public void sign(PrivateKey privateKey) {
         try {
             LOGGER.info("Signing transaction with ID: " + transactionId);
@@ -81,7 +82,7 @@ public class Transaction {
             e.printStackTrace();
         }
     }
-
+    /* Verifies the transaction's signature */
     public boolean verify() throws Exception {
         if (signature == null) {
             LOGGER.warning("Transaction " + transactionId + " has no signature.");
@@ -97,11 +98,13 @@ public class Transaction {
         return verifier.verify(signature);
     }
 
+    /* Helper method to generate data for signing */
     private String getSigningData() {
         LOGGER.info("Generating signing data for transaction: " + transactionId);
         return amount + sender.toString() + recipient.toString();
     }
 
+    /* Serializes the transaction to a JSON string */
     public String serialize() {
         LOGGER.info("Serializing transaction with ID: " + transactionId);
 

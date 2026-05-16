@@ -5,9 +5,9 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.logging.Logger;
-
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.json.JSONObject;
 
 public class Wallet {
     private final PublicKey publicKey;
@@ -38,8 +38,14 @@ public class Wallet {
         return publicKey;
     }
 
-    public JSONPObject toJSON() {
-        // TODO: implement for saving wallet to file
-        return null;
+    public void save() {
+        // TODO: Implement wallet saving to file logic
+    }
+
+    private JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        json.put("public_key", Base64.getEncoder().encodeToString(this.publicKey.getEncoded()));
+        json.put("private_key", Base64.getEncoder().encodeToString(this.privateKey.getEncoded()));
+        return json;
     }
 }

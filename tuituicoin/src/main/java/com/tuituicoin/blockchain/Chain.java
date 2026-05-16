@@ -53,7 +53,7 @@ public class Chain {
         Block block;
 
         if (lastBlock == null) {
-            block = new Block(0, "0", transaction);
+            block = new Block(0, "0", transaction); // Generate genesis block if no blocks exist
         } else {
             block = new Block(lastBlock.getHeight() + 1, lastBlock.getHash(), transaction);
         }
