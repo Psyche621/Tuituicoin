@@ -1,5 +1,7 @@
 package com.tuituicoin.blockchain;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -26,6 +28,10 @@ public class Wallet {
         LOGGER.info("Wallet key pair generated successfully.");
     }
 
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
     public void sendMoney(long amount, Block block, PublicKey payeePublicKey) throws Exception {
         LOGGER.info("Creating transaction to send " + amount + " coins to recipient.");
         Transaction transaction = new Transaction(amount, block.getHash(), this.publicKey, payeePublicKey);
@@ -34,12 +40,20 @@ public class Wallet {
         Chain.getInstance().addBlock(transaction);
     }
 
-    public PublicKey getPublicKey() {
-        return publicKey;
+    public void save() {
+        LOGGER.info("Saving wallet to file.");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new java.io.FileOutputStream("wallet.dat"))) {
+            JSONObject json = this.toJSON();
+            oos.writeObject(json.toString());
+            LOGGER.info("Wallet saved successfully.");
+        } catch (IOException e) {
+            LOGGER.severe("Failed to save wallet: " + e.getMessage());
+        }
     }
 
-    public void save() {
-        // TODO: Implement wallet saving to file logic
+    public Wallet load(String filename) throws IOException {
+        LOGGER.info("Loading wallet from file.");
+        
     }
 
     private JSONObject toJSON() {
