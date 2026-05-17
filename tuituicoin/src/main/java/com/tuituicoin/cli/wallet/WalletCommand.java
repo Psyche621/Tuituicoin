@@ -5,7 +5,8 @@ import picocli.CommandLine.Command;
 @Command(
     name = "wallet",
     subcommands = {
-        WalletCreateCommand.class
+        WalletCreateCommand.class,
+        WalletLoadCommand.class
     }
 )
 

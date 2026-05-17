@@ -11,7 +11,7 @@ import picocli.CommandLine.Option;
 
 @Command(
     name = "create",
-    description = "Create a new wallet"
+    description = "Create a new wallet and save it to a file"
 )
 
 public class WalletCreateCommand implements Callable<Integer> {

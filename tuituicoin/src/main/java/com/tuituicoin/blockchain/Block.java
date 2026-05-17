@@ -19,7 +19,8 @@ public class Block {
     private static final Logger LOGGER = Logger.getLogger(Block.class.getName());
 
     /* Constructor for loaded blocks. 
-     * Used for reconstructing a block found in an SQL query */
+     * Used for reconstructing a block found in an SQL query or 
+     * genesis block */
     public Block(String hash, int height, String prevHash, List<Transaction> transactions, Instant timestamp, int nonce) {
         this.hash = hash;
         this.height = height;

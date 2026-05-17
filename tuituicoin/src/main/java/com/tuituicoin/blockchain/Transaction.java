@@ -67,6 +67,14 @@ public class Transaction {
         return signature;
     }
 
+    public long getSent(PublicKey sender) {
+        return amount;
+    }
+
+    public long getReceived(PublicKey recipient) {
+        return amount;
+    }
+
     /* Signs the transaction with the provided private key */
     public void sign(PrivateKey privateKey) {
         try {

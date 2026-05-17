@@ -1,5 +1,6 @@
 package com.tuituicoin.repository;
 
+import java.security.PublicKey;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -13,4 +14,9 @@ public interface TransactionRepository {
     List<Transaction> findByBlockHash(String hash) throws SQLException;
 
     List<Transaction> findAll() throws SQLException;
+
+    List<Transaction> findBySender(PublicKey sender) throws SQLException;
+    
+    List<Transaction> findByRecipient(PublicKey recipient) throws SQLException;
 }
+

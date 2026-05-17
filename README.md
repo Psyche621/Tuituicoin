@@ -30,13 +30,13 @@ After running `python3 setup.py`, add the project directory to your system PATH 
 
 Edit your shell configuration file:
 
-Linux/MacOS (Mojave and older):
+## Linux/MacOS (Mojave and older):
 ```bash
 echo 'export PATH="'$(pwd)':$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-MacOS (Catalina and newer):
+## MacOS (Catalina and newer):
 ```zsh
 echo 'export PATH="'$(pwd)':$PATH"' >> ~/.zshrc
 source ~/.zshrc
@@ -54,7 +54,7 @@ GUI Method:
 2. Click **Environmental Variables**
 3. Under "User variables", click **New**
     - **Variable name:** `PATH`
-    - **Variable value:** Paste the program path 
+    - **Variable value:** Paste the path to tuiranode.bat
 4. Click **OK** three times
 5. **Close and reopen your terminal**
 
@@ -75,4 +75,4 @@ tuiranode.bat --help
 
 # Feedback
 
-If you find any bugs, performance ineffiencies or any other improvements I can make, please let me know! I won't be accepting merge requests as this is a learning project. Thank you!
+If you find any bugs, performance ineffiencies or any other improvements I can make, please create an issue and let me know! I won't be accepting merge requests as this is a learning project. Thank you!

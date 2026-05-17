@@ -25,6 +25,8 @@ replay_pid*
 
 # vscode settings
 .vscode/
+
+# Maven tests, tests, metadata, etc.
 tuituicoin/target/surefire-reports/com.tuituicoin.blockchain.ChainTest.txt
 tuituicoin/target/surefire-reports/com.tuituicoin.blockchain.TransactionTest.txt
 tuituicoin/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst
@@ -36,6 +38,7 @@ tuituicoin/target/surefire-reports/com.tuituicoin.blockchain.BlockTest.txt
 tuituicoin/target/maven-archiver/pom.properties
 tuituicoin/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
 tuituicoin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
-tuituicoin/hello.txt
-tuituicoin/src/main/java/com/tuituicoin/CheckSum.java
+
+# Local wallet and blockchain data
 wallet.dat
+blockchain.db

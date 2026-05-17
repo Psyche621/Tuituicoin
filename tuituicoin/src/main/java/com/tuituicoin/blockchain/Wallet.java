@@ -1,7 +1,6 @@
 package com.tuituicoin.blockchain;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,6 +32,10 @@ import org.json.JSONObject;
 public class Wallet {
     private final PublicKey publicKey;
     private final PrivateKey privateKey;
+    // TODO: Implement address generation once network layer is implemented
+    // private final String address;
+    private WalletStatus status;
+    private boolean defaultWallet;
 
     private static final Logger LOGGER = Logger.getLogger(Wallet.class.getName());
 

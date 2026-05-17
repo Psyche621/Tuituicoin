@@ -85,7 +85,7 @@ public class SQLiteTransactionRepository implements TransactionRepository {
                 return transactions;
             }
         } catch (SQLException e) {
-            LOGGER.severe("Failed to find transaction by ID: " + e.getMessage());
+            LOGGER.severe("Failed to find transaction by transaction ID: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -171,4 +171,79 @@ public class SQLiteTransactionRepository implements TransactionRepository {
             return null;
         }
     } 
+
+    @Override
+    public List<Transaction> findBySender(PublicKey sender) throws SQLException {
+        String senderString = Base64.getEncoder().encodeToString(sender.getEncoded());
+        String sql = """
+            SELECT * FROM transactions WHERE sender = ? 
+                """;
+        
+        try (Connection conn = DatabaseManager.connect()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, senderString);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+
+                List<Transaction> transactions = new ArrayList<>();
+
+                while(rs.next()) {
+                    String transactionId = rs.getString("transaction_id");
+                    String blockHash = rs.getString("block_hash");
+                    PublicKey recipient = PublicKeyStringDecoder.stringToPublicKey(rs.getString("recipient"));
+                    long amount = rs.getLong("amount");
+                    byte[] signature = rs.getBytes("signature");
+
+                    transactions.add(new Transaction(transactionId, blockHash, amount, sender, recipient, signature));
+                }
+
+                LOGGER.info("Transactions for sender: " + senderString + " found successfully.");
+                return transactions;
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Failed to find all transactions by sender: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<Transaction> findByRecipient(PublicKey recipient) throws SQLException {
+        String recipientString = Base64.getEncoder().encodeToString(recipient.getEncoded());
+        String sql = """
+            SELECT * FROM transactions WHERE recipient = ? 
+                """;
+        
+        try (Connection conn = DatabaseManager.connect()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+
+                List<Transaction> transactions = new ArrayList<>();
+
+                while(rs.next()) {
+                    String transactionId = rs.getString("transaction_id");
+                    String blockHash = rs.getString("block_hash");
+                    PublicKey sender = PublicKeyStringDecoder.stringToPublicKey(rs.getString("sender"));
+                    long amount = rs.getLong("amount");
+                    byte[] signature = rs.getBytes("signature");
+
+                    transactions.add(new Transaction(transactionId, blockHash, amount, sender, recipient, signature));
+                }
+
+                LOGGER.info("Transactions for recipient: " + recipientString + " found successfully.");
+                return transactions;
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Failed to find all transactions by recipient: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
