@@ -17,8 +17,13 @@ def get_script_dir():
 
 def check_maven():
     """Check if Maven is installed"""
+    system = platform.system()
     try:
-        subprocess.run(['mvn', '--version'], capture_output=True, check=True)
+        """ Explicitly invoke command interpreter on Windows to ensure .cmd files are found """
+        if system == 'Windows':
+            subprocess.run(['cmd', '/c', 'mvn.cmd', '--version'], capture_output=True, check=True)
+        if system in ['Linux', 'Darwin']:
+            subprocess.run(['mvn', '--version'], capture_output=True, check=True)
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
         return False
