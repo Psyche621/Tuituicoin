@@ -42,6 +42,11 @@ echo 'export PATH="'$(pwd)':$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
+Once the PATH has been set, test with:
+```bash
+tuiranode -V
+```
+
 ### Windows
 
 GUI Method:
