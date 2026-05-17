@@ -30,12 +30,14 @@ After running `python3 setup.py`, add the project directory to your system PATH 
 
 Edit your shell configuration file:
 
+Linux/MacOS (Mojave and older):
 ```bash
-# For bash (most common):
 echo 'export PATH="'$(pwd)':$PATH"' >> ~/.bashrc
 source ~/.bashrc
+```
 
-# For zsh (newer macOS default):
+MacOS (Catalina and newer):
+```zsh
 echo 'export PATH="'$(pwd)':$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
