@@ -2,13 +2,29 @@ package com.tuituicoin.blockchain;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.logging.Logger;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.json.JSONObject;
 
 public class Wallet {
@@ -17,6 +33,10 @@ public class Wallet {
 
     private static final Logger LOGGER = Logger.getLogger(Wallet.class.getName());
 
+    private static final int SALT_LENGTH = 16;
+    private static final int IV_LENGTH = 16;
+
+    /* Public constructor for generating a new wallet */
     public Wallet() throws NoSuchAlgorithmException {
         LOGGER.info("Generating new wallet key pair.");
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -26,6 +46,12 @@ public class Wallet {
         publicKey = keyPair.getPublic();
         privateKey = keyPair.getPrivate();
         LOGGER.info("Wallet key pair generated successfully.");
+    }
+
+    /* Private Wallet loader from file */
+    private Wallet(PublicKey publicKey, PrivateKey privateKey) {
+        this.publicKey = publicKey;
+        this.privateKey = privateKey;
     }
 
     public PublicKey getPublicKey() {
@@ -40,20 +66,163 @@ public class Wallet {
         Chain.getInstance().addBlock(transaction);
     }
 
-    public void save() {
+    /* Encrypt and save wallet to file using AES/GCM */
+    public void save(String fileName, String password) {
         LOGGER.info("Saving wallet to file.");
-        try (ObjectOutputStream oos = new ObjectOutputStream(new java.io.FileOutputStream("wallet.dat"))) {
+
+        // TODO: Add support for multiple wallet files and prevent overwriting existing files without confirmation
+        if (fileName == null || fileName.isEmpty()) {
+            LOGGER.info("No filename provided, using default 'wallet.dat'.");
+            fileName = "wallet.dat";
+        }
+
+        if (password == null || password.isEmpty()) {
+            LOGGER.severe("No password provided for wallet encryption. Please provide a password");
+            System.err.println("No password provided for wallet encryption. Please provide a password");
+            return;
+        }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new java.io.FileOutputStream(fileName))) {
             JSONObject json = this.toJSON();
-            oos.writeObject(json.toString());
+            byte[] walletBytes = json.toString().getBytes();
+            SecureRandom random = new SecureRandom();
+
+            // Salt for key derivation
+            byte[] salt = new byte[SALT_LENGTH];
+            random.nextBytes(salt);
+
+            // IV for encryption
+            byte[] iv = new byte[IV_LENGTH];
+            random.nextBytes(iv);
+
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret, new javax.crypto.spec.GCMParameterSpec(128, iv));
+
+            byte[] encrypted = cipher.doFinal(walletBytes);
+
+            // Write salt, IV, and encrypted data to file
+            byte[] output = new byte[salt.length + iv.length + encrypted.length];
+            System.arraycopy(salt, 0, output, 0, salt.length);
+            System.arraycopy(iv, 0, output, salt.length, iv.length);
+            System.arraycopy(encrypted, 0, output, salt.length + iv.length, encrypted.length);
+            Files.write(Paths.get(fileName), output);
+
             LOGGER.info("Wallet saved successfully.");
         } catch (IOException e) {
             LOGGER.severe("Failed to save wallet: " + e.getMessage());
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.severe("Encryption algorithm not found: " + e.getMessage());
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            LOGGER.severe("Invalid key specification: " + e.getMessage());
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            LOGGER.severe("Invalid encryption key: " + e.getMessage());
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            LOGGER.severe("No such padding scheme: " + e.getMessage());
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            LOGGER.severe("Invalid algorithm parameters: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.severe("Unexpected error while saving wallet: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    public Wallet load(String filename) throws IOException {
-        LOGGER.info("Loading wallet from file.");
-        
+    /* Load and decrypt wallet from file using AES/GCM/NoPadding. 
+     * Returns the loaded wallet or null if loading fails. */
+    public static Wallet load(String filename, String password) {
+        if (filename == null || filename.isEmpty()) {
+            LOGGER.info("No filename provided, using default 'wallet.dat'.");
+            filename = "wallet.dat";
+        }
+
+        if (password == null || password.isEmpty()) {
+            LOGGER.severe("No password provided for wallet decryption. Please provide a password");
+            System.err.println("No password provided for wallet decryption. Please provide a password");
+            return null;
+        }
+
+        LOGGER.info("Loading wallet from file '" + filename + "'.");
+
+        try {
+            byte[] fileBytes = Files.readAllBytes(Paths.get(filename));
+
+            // Extract salt
+            byte[] salt = new byte[SALT_LENGTH];
+            System.arraycopy(fileBytes, 0, salt, 0, SALT_LENGTH);
+
+            // Extract IV
+            byte[] iv = new byte[IV_LENGTH];
+            System.arraycopy(fileBytes, SALT_LENGTH, iv, 0, IV_LENGTH);
+
+            // Extract encrypted data
+            int encryptedStart = SALT_LENGTH + IV_LENGTH;
+            byte[] encrypted = new byte[fileBytes.length - encryptedStart];
+            System.arraycopy(filename, encryptedStart, encrypted, 0, encrypted.length);
+
+            // Recreate AES key
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+            // Decrypt wallet data
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, secret, new javax.crypto.spec.GCMParameterSpec(128, iv));
+            byte[] decrypted = cipher.doFinal(encrypted);
+
+            JSONObject json = new JSONObject(new String(decrypted));
+
+            // Rebuild keys
+            byte[] publicKeyBytes = Base64.getDecoder().decode(json.getString("public_key"));
+            byte[] privateKeyBytes = Base64.getDecoder().decode(json.getString("private_key"));
+
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+            PrivateKey privateKey = keyFactory.generatePrivate(new X509EncodedKeySpec(privateKeyBytes));
+
+            LOGGER.info("Wallet loaded successfully.");
+            return new Wallet(publicKey, privateKey);
+        } catch (IOException e) {
+            LOGGER.severe("Failed to read wallet file: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.severe("Encryption algorithm not found: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (InvalidKeySpecException e) {
+            LOGGER.severe("Invalid key specification: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (InvalidKeyException e) {
+            LOGGER.severe("Invalid encryption key: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (NoSuchPaddingException e) {
+            LOGGER.severe("No such padding scheme: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (InvalidAlgorithmParameterException e) {
+            LOGGER.severe("Invalid algorithm parameters: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            LOGGER.severe("Unexpected error while saving wallet: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private JSONObject toJSON() {
