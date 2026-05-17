@@ -38,3 +38,4 @@ tuituicoin/target/maven-status/maven-compiler-plugin/testCompile/default-testCom
 tuituicoin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
 tuituicoin/hello.txt
 tuituicoin/src/main/java/com/tuituicoin/CheckSum.java
+wallet.dat

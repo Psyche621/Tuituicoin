@@ -1,10 +1,10 @@
 package com.tuituicoin.cli.wallet;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import com.tuituicoin.blockchain.Wallet;
+import com.tuituicoin.blockchain.WalletManager;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -29,14 +29,27 @@ public class WalletCreateCommand implements Callable<Integer> {
         description = "Filename to save the wallet (default: wallet.dat)",
         required = false
     )
-    private String filename;
+    private String fileName;
+
+    @Option(
+        names = {"-o", "--overwrite"},
+        description = "Overwrite existing wallet file if it exists",
+        required = false,
+        defaultValue = "false"
+    )
+    private boolean overwrite;
 
     @Override
     public Integer call() {
         try {
             Wallet wallet = new Wallet();
-            wallet.save(filename, new String(password));
-            System.out.println("Wallet created and saved to: " + (filename != null ? filename : "wallet.dat"));
+
+            if (fileName == null || fileName.isEmpty()) {
+                fileName = WalletManager.generateWalletName();
+            }
+
+            wallet.save(fileName, new String(password), overwrite);
+            System.out.println("Wallet created and saved to: " + (fileName != null ? fileName : "wallet.dat"));
             Arrays.fill(password, '\0'); // Clear password from memory
             return 0;
         } catch (Exception e) {

@@ -32,13 +32,22 @@ def build_jar(script_dir):
     """Build the JAR file using Maven"""
     print("Building JAR file...")
     tuituicoin_dir = script_dir / 'tuituicoin'
+    system = platform.system()
     
     try:
-        result = subprocess.run(
-            ['mvn', 'clean', 'package'],
-            cwd=tuituicoin_dir,
-            capture_output=False
-        )
+        """ Explicitly invoke command interpreter on Windows to ensure .cmd files are found """
+        if system == 'Windows':
+            result = subprocess.run(
+                ['cmd', '/c', 'mvn.cmd', 'clean', 'package'],
+                cwd=tuituicoin_dir,
+                capture_output=False
+            )
+        if system in ['Linux', 'Darwin']:
+            result = subprocess.run(
+                ['mvn', 'clean', 'package'],
+                cwd=tuituicoin_dir,
+                capture_output=False
+            )
         if result.returncode != 0:
             print("Error: Maven build failed!")
             return False
