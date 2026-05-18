@@ -4,7 +4,7 @@ import picocli.CommandLine.Command;
 
 @Command(
     name = "mine",
-    subcommands = {}
+    description = "Commands related to mining new blocks"
 )
 
 public class MineCommand implements Runnable {

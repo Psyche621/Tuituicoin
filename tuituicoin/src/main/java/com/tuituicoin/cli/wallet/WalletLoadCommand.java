@@ -1,5 +1,9 @@
 package com.tuituicoin.cli.wallet;
 
+import java.util.Base64;
+
+import com.tuituicoin.blockchain.Wallet;
+
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -26,6 +30,17 @@ public class WalletLoadCommand implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("This will load your chosen wallet eventually");
+        try {
+            Wallet wallet = Wallet.load(fileName, new String(password));
+            // Clear password from memory            
+            java.util.Arrays.fill(password, '\0');
+            System.out.println("Wallet:");
+            System.out.println(" Name: " + fileName);
+            // System.out.println( "Address: " + wallet.getAddress());
+            System.out.println( "Public Key: " + Base64.getEncoder().encodeToString(wallet.getPublicKey().getEncoded()));
+        } catch (Exception e) {
+            System.err.println("Error loading wallet: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

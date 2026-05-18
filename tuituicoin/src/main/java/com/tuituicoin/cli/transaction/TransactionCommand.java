@@ -4,6 +4,7 @@ import picocli.CommandLine.Command;
 
 @Command(
     name = "tx",
+    description = "Commands related to transactions",
     subcommands = {}
 )
 
