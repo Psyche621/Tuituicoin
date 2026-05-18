@@ -3,6 +3,8 @@
 
 # Log file
 *.log
+*.log.*
+logs/
 
 # BlueJ files
 *.ctxt
@@ -40,5 +42,6 @@ tuituicoin/target/maven-status/maven-compiler-plugin/testCompile/default-testCom
 tuituicoin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
 
 # Local wallet and blockchain data
-wallet.dat
-blockchain.db
+wallets/
+*.dat
+*.db

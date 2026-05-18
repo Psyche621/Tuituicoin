@@ -23,9 +23,13 @@ public class ChainLatestCommand implements Runnable {
             System.out.println("Timestamp: " + latestBlock.getTimestamp());
             System.out.println("Nonce: " + latestBlock.getNonce());
             System.out.println("Transactions:");
-            latestBlock.getTransactions().forEach(tx -> {
-                System.out.println("- " + tx);
-            });
+            if (latestBlock.getTransactions() == null || latestBlock.getTransactions().isEmpty()) {
+                System.out.println("- No transactions in this block.");
+            } else {
+                latestBlock.getTransactions().forEach(tx -> {
+                    System.out.println("- " + tx);
+                });
+            }
         }
     }
 }
